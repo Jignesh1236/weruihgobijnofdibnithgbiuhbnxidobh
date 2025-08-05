@@ -438,7 +438,7 @@ export default function AdminDashboard() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 }}
                     >
-                      SANTMEGH Computer Education Management
+                      Santmegh Computer Education Management
                     </motion.p>
                   </div>
                 </div>
