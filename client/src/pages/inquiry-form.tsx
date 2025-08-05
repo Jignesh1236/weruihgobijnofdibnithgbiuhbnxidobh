@@ -24,7 +24,7 @@ const inquirySchema = z.object({
   address: z.string().min(10, "Address must be at least 10 characters"),
   fatherContactNo: z.string().regex(/^[0-9]{10}$/, "Please enter a valid 10-digit mobile number"),
   batchId: z.string().min(1, "Please select a batch"),
-  status: z.enum(["pending", "confirm"], { required_error: "Please select an action status" }),
+  status: z.enum(["pending", "confirmed"], { required_error: "Please select an action status" }),
 });
 
 type InquiryFormData = z.infer<typeof inquirySchema>;
@@ -47,7 +47,7 @@ export default function InquiryForm() {
       address: "",
       fatherContactNo: "",
       batchId: "",
-      status: undefined,
+      status: "pending",
     },
   });
 
@@ -67,7 +67,7 @@ export default function InquiryForm() {
           description: "Student inquiry has been saved successfully. You can review it later from the inquiries list.",
         });
         setTimeout(() => setLocation("/"), 2000);
-      } else if (status === "confirm") {
+      } else if (status === "confirmed") {
         toast({
           title: "Inquiry Confirmed!",
           description: "Proceeding to enrollment form...",
@@ -252,7 +252,7 @@ export default function InquiryForm() {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="pending">Pending - Save for later review</SelectItem>
-                      <SelectItem value="confirm">Confirm - Proceed to enrollment</SelectItem>
+                      <SelectItem value="confirmed">Confirmed - Proceed to enrollment</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
