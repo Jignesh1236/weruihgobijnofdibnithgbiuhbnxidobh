@@ -8,6 +8,14 @@ export default function Navbar() {
   const [location] = useLocation();
   const { logout } = useAuth();
 
+  const handleLogout = () => {
+    logout();
+    // Auto refresh after logout
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  };
+
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/inquiry/new", label: "New Inquiry", icon: FileText },
@@ -61,7 +69,7 @@ export default function Navbar() {
           {/* Logout Button */}
           <div className="flex items-center space-x-3">
             <Button
-              onClick={logout}
+              onClick={handleLogout}
               variant="outline"
               size="sm"
               className="hidden sm:flex items-center space-x-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
@@ -72,7 +80,7 @@ export default function Navbar() {
             
             {/* Mobile Logout */}
             <Button
-              onClick={logout}
+              onClick={handleLogout}
               variant="outline"
               size="sm"
               className="sm:hidden p-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
