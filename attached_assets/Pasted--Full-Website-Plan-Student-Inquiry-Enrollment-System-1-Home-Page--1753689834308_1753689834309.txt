@@ -1,0 +1,75 @@
+## 🏗️ Full Website Plan: Student Inquiry & Enrollment System
+
+---
+
+### 🔹 **1. Home Page**
+
+#### Structure:
+
+* Navbar (Logo, Home, Contact, Admin/Login)
+* 3 Buttons:
+
+  * **1st: New Inquiry** ✅ *(Main focus now)*
+  * 2nd: View All Inquiries (Admin/Staff only)
+  * 3rd: Reports / Downloads / Stats (optional future)
+
+---
+
+### 🔹 **2. New Inquiry Flow (Main Feature)**
+
+#### Step 1: Inquiry Form (Initial Page)
+
+| Field             | Type                        |
+| ----------------- | --------------------------- |
+| Student Name      | Text                        |
+| Course            | Dropdown (dynamic)          |
+| Contact No        | Text/Phone                  |
+| Address           | Text                        |
+| Father Contact No | Text/Phone                  |
+| Action            | Dropdown: Confirm / Pending |
+| Submit Button     | On submit, check dropdown   |
+
+#### 🧠 Logic:
+
+* If **Pending** → Save all fields to `inquiries` table in DB with status `"pending"`
+* If **Confirm** → Redirect to Enrollment Form (Step 2)
+
+---
+
+### 🔹 **3. Enrollment Form (Second Page)**
+
+| Field                    | Type                    |
+| ------------------------ | ----------------------- |
+| Student Name             | Auto-filled             |
+| Selected Course          | Auto-filled             |
+| Student Contact No       | Auto-filled             |
+| Father Name              | Text                    |
+| Father Contact No        | Auto-filled             |
+| Student Education        | Text                    |
+| Student Email ID         | Email                   |
+| Student Address          | Text                    |
+| Course Duration (Months) | Auto-filled from course |
+| Start Date               | Date input              |
+| End Date                 | Auto-calculated         |
+| Fee Plan                 | Radio: Plan 1 / Plan 2  |
+| - Plan 1: Full Fees      | Show total fee          |
+| - Plan 2: 3 Installments | Split amount equally    |
+
+✔ All data saved in `enrollments` table.
+
+---
+
+
+---
+
+## 🔄 Flow Summary
+
+1. **User clicks "New Inquiry"** → `/inquiry/new`
+2. Fills student info → Chooses `"Pending"` or `"Confirm"`
+3. If "Pending" → Save to DB ✅
+4. If "Confirm" → Go to `/inquiry/enroll`
+5. Course selected → Auto show duration & fee
+6. Select fee plan → Enter start date → Calculate end date
+7. Save to DB ✅
+
+---

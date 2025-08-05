@@ -1,0 +1,152 @@
+Here's a clean and structured summary of the **fee plans** for each course, including **duration**, **full fees**, **installment amount**, and **breakdown of plans**:
+
+---
+
+### **Office Basic** (3 months)
+
+* **Full Fees**: ₹3500
+* **Installments**: ₹3750
+  **Plan 1**:
+  • 1st: ₹2000
+  • 2nd: ₹1500
+  • 3rd: ₹250
+
+**Plan 2**:
+• 1st: ₹2500
+• 2nd: ₹1250
+
+---
+
+### **CCC ITC** (3 months)
+
+* **Full Fees**: ₹3500
+* **Installments**: ₹3750
+  **Plan 1**:
+  • 1st: ₹2000
+  • 2nd: ₹1500
+  • 3rd: ₹250
+
+**Plan 2**:
+• 1st: ₹2500
+• 2nd: ₹1250
+
+---
+
+### **C.C.C (DOEACC)** (6 months)
+
+* **Full Fees**: ₹4000
+* **Installments**: ₹4000
+  **Plan 1**:
+  • 1st: ₹2000
+  • 2nd: ₹1000
+  • 3rd: ₹1000
+
+**Plan 2**:
+• 1st: ₹2000
+• 2nd: ₹2000
+
+---
+
+### **Tally Basic A** (3 months)
+
+* **Full Fees**: ₹5000
+* **Installments**: ₹5500
+  **Plan 1**:
+  • 1st: ₹2500
+  • 2nd: ₹1500
+  • 3rd: ₹1500
+
+**Plan 2**:
+• 1st: ₹3000
+• 2nd: ₹1500
+• 3rd: ₹1000
+
+---
+
+### **Tally GST** (6 months)
+
+* **Full Fees**: ₹13000
+* **Installments**: ₹13500
+  **Plan 1**:
+  • 1st: ₹3500
+  • 2nd: ₹2000 × 4
+  • 3rd: ₹2000
+
+**Plan 2**:
+• 1st: ₹3500
+• 2nd: ₹3000 × 3
+• 3rd: ₹1000
+
+---
+
+### **D.E.O (Data Entry Operator)** (6 months)
+
+* **Full Fees**: ₹10500
+* **Installments**: ₹13500
+  **Plan 1**:
+  • 1st: ₹4500
+  • 2nd: ₹3000
+  • 3rd: ₹2000 × 3
+
+---
+
+### **D.T.P (Desktop Publishing)** (6 months)
+
+* **Full Fees**: ₹5000
+* **Installments**: ₹5500
+  **Plan 1**:
+  • 1st: ₹3000
+  • 2nd: ₹1500
+  • 3rd: ₹1000
+
+**Plan 2**:
+• 1st: ₹2000
+• 2nd: ₹2000
+• 3rd: ₹1500
+
+---
+
+### **AutoCAD** (3 months)
+
+* **Full Fees**: ₹7000
+* **Installments**: ₹7000
+  **Plan 1**:
+  • 1st: ₹3000
+  • 2nd: ₹3000
+  • 3rd: ₹1000
+
+**Plan 2**:
+• 1st: ₹2000
+• 2nd: ₹2000
+• 3rd: ₹1000 × 3
+
+---
+
+### **D.C.A (Diploma in Computer Applications)** (12 months)
+
+* **Full Fees**: ₹27000
+* **Installments**: ₹27500
+  **Plan 1**:
+  • 1st: ₹5000
+  • 2nd: ₹2500 × 5
+  • 3rd: ₹2500 × 4
+
+**Plan 2**:
+• 1st: ₹5500
+• 2nd: ₹3000 × 4
+• 3rd: ₹2500 × 4
+
+---
+
+### **H.D.C.A (Higher Diploma in Computer Applications)** (24 months)
+
+* **Full Fees**: ₹35000
+* **Installments**: ₹35500
+  **Plan 1**:
+  • 1st: ₹7500
+  • 2nd: ₹7000 × 2
+  • 3rd: ₹7000 × 2
+
+---
+
+Let me know if you'd like this in **table format**, **PDF**, **printable brochure**, or want **editable Excel/Word files**.
