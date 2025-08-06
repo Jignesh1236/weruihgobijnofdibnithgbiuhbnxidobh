@@ -61,11 +61,11 @@ export default function Login() {
       <Card className="w-full max-w-md relative z-10 shadow-xl border-none bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
         <CardHeader className="text-center pb-6">
           <div className="flex justify-center mb-6">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-32 h-32 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center shadow-xl border-2 border-white/50">
               <img 
                 src={logoImage} 
                 alt="Santmegh Computer Education" 
-                className="h-20 w-20 object-contain rounded-full"
+                className="h-24 w-24 object-contain"
               />
             </div>
           </div>
