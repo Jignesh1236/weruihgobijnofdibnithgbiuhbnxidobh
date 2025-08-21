@@ -137,7 +137,38 @@ export default function Home() {
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
-    visible: { opacity: 1, y: 0 }
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }
+    }
+  };
+
+  const fadeInFromSide = {
+    hidden: { opacity: 0, x: -100 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: {
+        duration: 0.8,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }
+    }
+  };
+
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }
+    }
   };
 
   const staggerContainer = {
@@ -145,7 +176,32 @@ export default function Home() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
+        staggerChildren: 0.15,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const cardHover = {
+    hover: {
+      y: -12,
+      scale: 1.03,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20
+      }
+    }
+  };
+
+  const floatingAnimation = {
+    animate: {
+      y: [0, -10, 0],
+      transition: {
+        duration: 4,
+        ease: "easeInOut",
+        repeat: Infinity,
+        repeatType: "loop" as const
       }
     }
   };
@@ -156,7 +212,8 @@ export default function Home() {
       <motion.section 
         className="relative px-4 py-16 sm:px-6 lg:px-8"
         initial="hidden"
-        animate="visible"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
         variants={staggerContainer}
       >
         
@@ -168,13 +225,18 @@ export default function Home() {
             variants={fadeInUp}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center justify-center p-4 mb-8 bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700">
+            <motion.div 
+              className="inline-flex items-center justify-center p-4 mb-8 bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700"
+              variants={scaleIn}
+              whileHover={{ scale: 1.05 }}
+              {...floatingAnimation}
+            >
               <img 
                 src={logoImage} 
                 alt="Santmegh Computer Education" 
                 className="h-32 sm:h-40 lg:h-48 w-auto object-contain"
               />
-            </div>
+            </motion.div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
               <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent pt-[5px] pb-[5px]">
@@ -188,7 +250,13 @@ export default function Home() {
             </p>
 
             {/* Quick Stats Bar */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
+            <motion.div 
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+            >
               {[
                 { label: "Total Students", value: stats?.enrolledStudents || 0, icon: Users, color: "text-blue-600" },
                 { label: "Active Courses", value: courses?.length || 0, icon: BookOpen, color: "text-green-600" },
@@ -198,19 +266,28 @@ export default function Home() {
                 <motion.div
                   key={index}
                   className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-700"
-                  variants={fadeInUp}
-                  transition={{ delay: 0.1 * index }}
+                  variants={scaleIn}
+                  whileHover={{ 
+                    scale: 1.05, 
+                    y: -5,
+                    transition: { type: "spring", stiffness: 300 }
+                  }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <div className="flex items-center justify-center mb-2">
+                  <motion.div 
+                    className="flex items-center justify-center mb-2"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
                     <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                  </div>
+                  </motion.div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</div>
                   </div>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Live Status */}
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-8">
@@ -219,7 +296,13 @@ export default function Home() {
             </div>
 
             {/* Key Features */}
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <motion.div 
+              className="flex flex-wrap justify-center gap-4 mb-8"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+            >
               {[
                 { icon: Shield, text: "Secure Platform", color: "text-green-600" },
                 { icon: Zap, text: "Fast Performance", color: "text-yellow-600" },
@@ -229,14 +312,23 @@ export default function Home() {
                 <motion.div
                   key={index}
                   className="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-md border border-gray-200 dark:border-gray-700"
-                  variants={fadeInUp}
-                  transition={{ delay: 0.1 * index }}
+                  variants={fadeInFromSide}
+                  whileHover={{ 
+                    scale: 1.1, 
+                    x: 5,
+                    transition: { type: "spring", stiffness: 400, damping: 15 }
+                  }}
                 >
-                  <feature.icon className={`h-4 w-4 ${feature.color}`} />
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <feature.icon className={`h-4 w-4 ${feature.color}`} />
+                  </motion.div>
                   <span className="text-sm font-medium">{feature.text}</span>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Login Button */}
             <motion.div 
@@ -258,6 +350,9 @@ export default function Home() {
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
             variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
           >
             {[
               {
@@ -308,9 +403,18 @@ export default function Home() {
               <motion.div
                 key={index}
                 variants={fadeInUp}
-                transition={{ delay: 0.15 * index }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{
+                  y: -12,
+                  scale: 1.03,
+                  rotateY: 5,
+                  transition: {
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 20
+                  }
+                }}
+                whileTap={{ scale: 0.97 }}
+                className="perspective-1000"
               >
                 <Link href={action.href}>
                   <Card className={`group relative overflow-hidden bg-gradient-to-br ${action.bgGradient} border-0 shadow-xl hover:shadow-2xl transition-all duration-700 cursor-pointer h-full`}>
@@ -585,7 +689,7 @@ export default function Home() {
         className="px-4 py-16 sm:px-6 lg:px-8 bg-white dark:bg-gray-900"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: "-100px" }}
         variants={staggerContainer}
       >
         <div className="max-w-7xl mx-auto">
@@ -646,8 +750,16 @@ export default function Home() {
                   change: "-15%"
                 }
               ].map((stat, index) => (
-                <motion.div key={index} variants={fadeInUp} transition={{ delay: 0.1 * index }}>
-                  <Card className={`p-6 bg-gradient-to-br ${stat.bgGradient} border-0 hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
+                <motion.div 
+                  key={index} 
+                  variants={scaleIn}
+                  whileHover={{
+                    y: -8,
+                    scale: 1.05,
+                    transition: { type: "spring", stiffness: 300, damping: 20 }
+                  }}
+                >
+                  <Card className={`p-6 bg-gradient-to-br ${stat.bgGradient} border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer`}>
                     <div className="flex items-center justify-between mb-4">
                       <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center`}>
                         <stat.icon className="h-6 w-6 text-white" />
@@ -672,8 +784,8 @@ export default function Home() {
         className="relative px-4 py-16 sm:px-6 lg:px-8 overflow-hidden"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeInUp}
+        viewport={{ once: true, margin: "-150px" }}
+        variants={staggerContainer}
       >
         {/* Floating Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
