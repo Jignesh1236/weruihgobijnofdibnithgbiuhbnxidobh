@@ -219,9 +219,29 @@ export default function PaymentRecordForm({ enrollment, enrollments, onClose }: 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Transaction ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter transaction ID (optional)" {...field} />
-                    </FormControl>
+                    <div className="flex gap-2">
+                      <FormControl>
+                        <Input placeholder="Enter transaction ID (optional)" {...field} />
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (selectedEnrollment?.studentName) {
+                            // Take only first two names from student name
+                            const nameParts = selectedEnrollment.studentName.trim().split(/\s+/);
+                            const firstTwoNames = nameParts.slice(0, 2).join(' ');
+                            // Convert to lowercase and remove spaces
+                            const transactionId = firstTwoNames.toLowerCase().replace(/\s+/g, ' ');
+                            form.setValue("transactionId", transactionId);
+                          }
+                        }}
+                        className="whitespace-nowrap"
+                      >
+                        Auto Generate
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
