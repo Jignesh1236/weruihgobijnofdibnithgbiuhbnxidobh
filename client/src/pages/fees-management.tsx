@@ -126,6 +126,38 @@ export default function FeesManagement() {
     },
   });
 
+  const updateEnrollmentStatusMutation = useMutation({
+    mutationFn: async ({ enrollmentId, status }: { enrollmentId: string, status: string }) => {
+      const response = await fetch(`/api/enrollments/${enrollmentId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update enrollment status");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate enrollment-related caches
+      queryClient.invalidateQueries({ queryKey: ["/api/enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      toast({
+        title: "Success",
+        description: "Enrollment status updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update enrollment status",
+        variant: "destructive",
+      });
+    },
+  });
+
 
 
   const handleRecordPayment = (enrollment: EnrollmentWithDetails) => {
@@ -147,6 +179,10 @@ export default function FeesManagement() {
     if (window.confirm("Are you sure you want to delete this custom fee?")) {
       deleteCustomFeeMutation.mutate(feeId);
     }
+  };
+
+  const handleEnrollmentStatusChange = (enrollmentId: string, status: string) => {
+    updateEnrollmentStatusMutation.mutate({ enrollmentId, status });
   };
 
   return (
@@ -420,7 +456,8 @@ export default function FeesManagement() {
                       <TableHead>Course</TableHead>
                       <TableHead>Total Fee</TableHead>
                       <TableHead>Paid Amount</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Payment Status</TableHead>
+                      <TableHead>Enrollment Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -460,6 +497,27 @@ export default function FeesManagement() {
                             <Badge className={paymentStatus.color}>
                               {paymentStatus.status}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Select 
+                              value={enrollment.status || "active"} 
+                              onValueChange={(value) => handleEnrollmentStatusChange(enrollment.id, value)}
+                            >
+                              <SelectTrigger className="w-32 h-8 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="active">
+                                  <Badge className="text-green-800 bg-green-100">Active</Badge>
+                                </SelectItem>
+                                <SelectItem value="cancelled">
+                                  <Badge className="text-red-800 bg-red-100">Cancelled</Badge>
+                                </SelectItem>
+                                <SelectItem value="completed">
+                                  <Badge className="text-blue-800 bg-blue-100">Completed</Badge>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell>
                             <div className="flex space-x-2 flex-wrap gap-1">
