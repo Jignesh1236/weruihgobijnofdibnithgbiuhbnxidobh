@@ -9,7 +9,7 @@ import {
   type CustomStudentFee, type InsertCustomStudentFee, type CustomStudentFeeWithCourse
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, sql, and, inArray } from "drizzle-orm";
+import { eq, desc, sql, and, inArray, ne } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -385,7 +385,8 @@ export class DatabaseStorage implements IStorage {
 
     const [enrollmentCount] = await db
       .select({ count: sql<number>`count(*)::int` })
-      .from(enrollments);
+      .from(enrollments)
+      .where(ne(enrollments.status, 'cancelled'));
 
     const [totalCollected] = await db
       .select({ total: sql<string>`coalesce(sum(amount), 0)` })
@@ -397,7 +398,12 @@ export class DatabaseStorage implements IStorage {
     let overdueCount = 0;
     const today = new Date();
 
-    enrollmentsWithPayments.forEach((enrollment) => {
+    // Filter out cancelled enrollments from fee calculations
+    const activeEnrollments = enrollmentsWithPayments.filter(enrollment => 
+      enrollment.status !== 'cancelled'
+    );
+
+    activeEnrollments.forEach((enrollment) => {
       const paidAmount = enrollment.payments.reduce((sum, payment) => 
         sum + parseFloat(payment.amount.toString()), 0);
       const totalFee = parseFloat(enrollment.totalFee.toString());
