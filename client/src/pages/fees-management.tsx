@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Download, Bell, CheckCircle, Clock, AlertTriangle, Users, CreditCard, DollarSign, MessageSquare, UserCheck, Edit, Trash2, Settings, Search, Filter, X } from "lucide-react";
+import { ArrowLeft, Plus, Download, Bell, CheckCircle, Clock, AlertTriangle, Users, CreditCard, DollarSign, MessageSquare, UserCheck, Edit, Trash2, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,11 +31,6 @@ export default function FeesManagement() {
   const [selectedEnrollment, setSelectedEnrollment] = useState<EnrollmentWithDetails | null>(null);
   const [selectedCustomFee, setSelectedCustomFee] = useState<CustomStudentFeeWithCourse | null>(null);
   const [activeTab, setActiveTab] = useState("payments");
-  
-  // Search and Filter states
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [courseFilter, setCourseFilter] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -52,53 +45,6 @@ export default function FeesManagement() {
   const { data: customFees, isLoading: customFeesLoading } = useQuery<CustomStudentFeeWithCourse[]>({
     queryKey: ["/api/custom-fees"],
   });
-
-  // Payment status helper function (moved up to fix hoisting issue)
-  const getPaymentStatus = (enrollment: EnrollmentWithDetails) => {
-    const totalFee = parseFloat(enrollment.totalFee);
-    const paidAmount = enrollment.payments.reduce((sum, payment) => 
-      sum + parseFloat(payment.amount), 0);
-
-    if (paidAmount >= totalFee) {
-      return { status: "Paid", variant: "default" as const, color: "text-green-800 bg-green-100" };
-    } else if (paidAmount > 0) {
-      return { status: "Partial", variant: "secondary" as const, color: "text-yellow-800 bg-yellow-100" };
-    } else {
-      // Check if overdue (30 days from start date)
-      const dueDate = new Date(enrollment.startDate);
-      dueDate.setDate(dueDate.getDate() + 30);
-      const isOverdue = new Date() > dueDate;
-
-      if (isOverdue) {
-        return { status: "Overdue", variant: "destructive" as const, color: "text-red-800 bg-red-100" };
-      } else {
-        return { status: "Pending", variant: "outline" as const, color: "text-gray-800 bg-gray-100" };
-      }
-    }
-  };
-
-  // Filter enrollments based on search and filters
-  const filteredEnrollments = enrollments?.filter(enrollment => {
-    // Exclude cancelled students from fee management
-    if (enrollment.status === 'cancelled') {
-      return false;
-    }
-    
-    const matchesSearch = 
-      enrollment.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      enrollment.course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      enrollment.contactNo.includes(searchTerm);
-    
-    const paymentStatus = getPaymentStatus(enrollment);
-    const matchesStatus = statusFilter === "all" || paymentStatus.status.toLowerCase() === statusFilter.toLowerCase();
-    
-    const matchesCourse = courseFilter === "all" || enrollment.course.name === courseFilter;
-    
-    return matchesSearch && matchesStatus && matchesCourse;
-  }) || [];
-
-  // Get unique courses for course filter dropdown
-  const uniqueCourses = Array.from(new Set(enrollments?.map(e => e.course.name) || []));
 
   const deleteCustomFeeMutation = useMutation({
     mutationFn: async (feeId: string) => {
@@ -131,38 +77,6 @@ export default function FeesManagement() {
     },
   });
 
-  const updateEnrollmentStatusMutation = useMutation({
-    mutationFn: async ({ enrollmentId, status }: { enrollmentId: string, status: string }) => {
-      const response = await fetch(`/api/enrollments/${enrollmentId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update enrollment status");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      // Invalidate enrollment-related caches
-      queryClient.invalidateQueries({ queryKey: ["/api/enrollments"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
-      toast({
-        title: "Success",
-        description: "Enrollment status updated successfully",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update enrollment status",
-        variant: "destructive",
-      });
-    },
-  });
-
 
 
   const handleRecordPayment = (enrollment: EnrollmentWithDetails) => {
@@ -186,8 +100,29 @@ export default function FeesManagement() {
     }
   };
 
-  const handleEnrollmentStatusChange = (enrollmentId: string, status: string) => {
-    updateEnrollmentStatusMutation.mutate({ enrollmentId, status });
+
+
+  const getPaymentStatus = (enrollment: EnrollmentWithDetails) => {
+    const totalFee = parseFloat(enrollment.totalFee);
+    const paidAmount = enrollment.payments.reduce((sum, payment) => 
+      sum + parseFloat(payment.amount), 0);
+
+    if (paidAmount >= totalFee) {
+      return { status: "Paid", variant: "default" as const, color: "text-green-800 bg-green-100" };
+    } else if (paidAmount > 0) {
+      return { status: "Partial", variant: "secondary" as const, color: "text-yellow-800 bg-yellow-100" };
+    } else {
+      // Check if overdue (30 days from start date)
+      const dueDate = new Date(enrollment.startDate);
+      dueDate.setDate(dueDate.getDate() + 30);
+      const isOverdue = new Date() > dueDate;
+
+      if (isOverdue) {
+        return { status: "Overdue", variant: "destructive" as const, color: "text-red-800 bg-red-100" };
+      } else {
+        return { status: "Pending", variant: "outline" as const, color: "text-gray-800 bg-gray-100" };
+      }
+    }
   };
 
   return (
@@ -357,102 +292,11 @@ export default function FeesManagement() {
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">Student Fee Status</h3>
             </div>
-            
-            {/* Search and Filter Section */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Search by student name, course, or contact number..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 rounded-xl border-2 focus:border-blue-400"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-56 rounded-xl border-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                      <Filter className="mr-2 h-4 w-4 text-gray-500" />
-                      <SelectValue placeholder="Filter by Status" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl z-50">
-                      <SelectItem value="all" className="hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer">
-                        All Payment Status
-                      </SelectItem>
-                      <SelectItem value="paid" className="hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer">
-                        Paid
-                      </SelectItem>
-                      <SelectItem value="partial" className="hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer">
-                        Partial
-                      </SelectItem>
-                      <SelectItem value="pending" className="hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer">
-                        Pending
-                      </SelectItem>
-                      <SelectItem value="overdue" className="hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer">
-                        Overdue
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select value={courseFilter} onValueChange={setCourseFilter}>
-                    <SelectTrigger className="w-56 rounded-xl border-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                      <Filter className="mr-2 h-4 w-4 text-gray-500" />
-                      <SelectValue placeholder="Filter by Course" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl z-50">
-                      <SelectItem value="all" className="hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer">
-                        All Courses
-                      </SelectItem>
-                      {uniqueCourses.map((course) => (
-                        <SelectItem 
-                          key={course} 
-                          value={course}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer"
-                        >
-                          {course}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Button
-                    variant="outline"
-                    className="rounded-xl border-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    onClick={() => {
-                      setSearchTerm("");
-                      setStatusFilter("all");
-                      setCourseFilter("all");
-                    }}
-                  >
-                    <X className="mr-2 h-4 w-4" />
-                    Clear
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Results counter */}
-              <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                Showing {filteredEnrollments.length} of {enrollments?.length || 0} students
-                {(searchTerm || statusFilter !== "all" || courseFilter !== "all") && (
-                  <span className="ml-2 text-blue-600 dark:text-blue-400">
-                    (filtered)
-                  </span>
-                )}
-              </div>
-            </div>
-            
             <div className="overflow-x-auto">
               {isLoading ? (
                 <div className="p-6 text-center">Loading enrollment data...</div>
               ) : !enrollments || enrollments.length === 0 ? (
                 <div className="p-6 text-center text-gray-500">No enrollments found</div>
-              ) : filteredEnrollments.length === 0 ? (
-                <div className="p-6 text-center text-gray-500">
-                  No students match your current filters. Try adjusting your search or filters.
-                </div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -461,13 +305,12 @@ export default function FeesManagement() {
                       <TableHead>Course</TableHead>
                       <TableHead>Total Fee</TableHead>
                       <TableHead>Paid Amount</TableHead>
-                      <TableHead>Payment Status</TableHead>
-                      <TableHead>Enrollment Status</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredEnrollments.map((enrollment) => {
+                    {enrollments.map((enrollment) => {
                       const totalFee = parseFloat(enrollment.totalFee);
                       const paidAmount = enrollment.payments.reduce((sum, payment) => 
                         sum + parseFloat(payment.amount), 0);
@@ -502,27 +345,6 @@ export default function FeesManagement() {
                             <Badge className={paymentStatus.color}>
                               {paymentStatus.status}
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Select 
-                              value={enrollment.status || "active"} 
-                              onValueChange={(value) => handleEnrollmentStatusChange(enrollment.id, value)}
-                            >
-                              <SelectTrigger className="w-32 h-8 text-xs">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="active">
-                                  <Badge className="text-green-800 bg-green-100">Active</Badge>
-                                </SelectItem>
-                                <SelectItem value="cancelled">
-                                  <Badge className="text-red-800 bg-red-100">Cancelled</Badge>
-                                </SelectItem>
-                                <SelectItem value="completed">
-                                  <Badge className="text-blue-800 bg-blue-100">Completed</Badge>
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
                           </TableCell>
                           <TableCell>
                             <div className="flex space-x-2 flex-wrap gap-1">

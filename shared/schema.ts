@@ -9,23 +9,6 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
 });
 
-// Enums
-export const inquiryStatusEnum = pgEnum('inquiry_status', [
-  'pending', 
-  'contacted', 
-  'enrolled', 
-  'books_given',
-  'exam_completed', 
-  'certificate_issued',
-  'cancelled'
-]);
-
-export const enrollmentStatusEnum = pgEnum('enrollment_status', [
-  'active',
-  'cancelled', 
-  'completed'
-]);
-
 export const courses = pgTable("courses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -70,7 +53,6 @@ export const enrollments = pgTable("enrollments", {
   feePlan: text("fee_plan").notNull(), // 'full' | 'installments'
   totalFee: decimal("total_fee", { precision: 10, scale: 2 }).notNull(),
   batchId: text("batch_id").notNull(),
-  status: enrollmentStatusEnum("status").notNull().default("active"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -166,12 +148,22 @@ export const insertCourseSchema = createInsertSchema(courses).omit({
   createdAt: true,
 });
 
+export const inquiryStatusEnum = pgEnum('inquiry_status', [
+  'pending', 
+  'contacted', 
+  'enrolled', 
+  'books_given',
+  'exam_completed', 
+  'certificate_issued',
+  'cancelled'
+]);
+
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 }).extend({
-  status: z.enum(["pending", "confirmed", "enrolled", "books_given", "exam_completed", "certificate_issued", "cancelled"]),
+  status: z.enum(["pending", "confirmed", "enrolled", "books_given", "exam_completed", "certificate_issued"]),
 });
 
 // Batch definitions
@@ -189,8 +181,6 @@ export const insertEnrollmentSchema = createInsertSchema(enrollments).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-}).extend({
-  status: z.enum(["active", "cancelled", "completed"]).default("active"),
 });
 
 export const insertPaymentSchema = createInsertSchema(payments).omit({
