@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Users, Search, Filter, Download, Trash2, Edit, Eye, UserCheck, Phone, Mail, Calendar, Clock, AlertTriangle, User } from "lucide-react";
+import { ArrowLeft, Users, Search, Filter, Download, Trash2, Edit, Eye, UserCheck, Phone, Mail, Calendar, Clock, AlertTriangle, User, Ban } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ export default function StudentSettings() {
   const [courseFilter, setCourseFilter] = useState("");
   const [batchFilter, setBatchFilter] = useState("");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("");
+  const [cancelledFilter, setCancelledFilter] = useState("");
   const [viewingStudent, setViewingStudent] = useState<EnrollmentWithDetails | null>(null);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
 
@@ -54,6 +55,34 @@ export default function StudentSettings() {
       toast({
         title: "Error",
         description: "Failed to delete student",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/enrollments/${id}/cancel`, {
+        method: "PATCH",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to cancel student enrollment");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+      toast({
+        title: "Success",
+        description: "Student enrollment cancelled successfully",
+      });
+    },
+    onError: (error: any) => {
+      const message = error?.message || "Failed to cancel student enrollment";
+      toast({
+        title: "Error",
+        description: message,
         variant: "destructive",
       });
     },
@@ -96,6 +125,13 @@ export default function StudentSettings() {
     const matchesCourse = !courseFilter || courseFilter === "all" || student.courseId === courseFilter;
     const matchesBatch = !batchFilter || batchFilter === "all" || student.batchId === batchFilter;
 
+    // Add cancelled status filter
+    let matchesCancelled = true;
+    if (cancelledFilter && cancelledFilter !== "all") {
+      if (cancelledFilter === "active" && student.cancelled === true) matchesCancelled = false;
+      if (cancelledFilter === "cancelled" && student.cancelled !== true) matchesCancelled = false;
+    }
+
     let matchesPaymentStatus = true;
     if (paymentStatusFilter && paymentStatusFilter !== "all") {
       const totalFee = parseFloat(student.totalFee.toString());
@@ -107,7 +143,7 @@ export default function StudentSettings() {
       if (paymentStatusFilter === "partial" && (pendingAmount <= 0 || pendingAmount >= totalFee)) matchesPaymentStatus = false;
     }
 
-    return matchesSearch && matchesCourse && matchesBatch && matchesPaymentStatus;
+    return matchesSearch && matchesCourse && matchesBatch && matchesCancelled && matchesPaymentStatus;
   });
 
   const getPaymentStatus = (student: EnrollmentWithDetails) => {
@@ -161,7 +197,7 @@ export default function StudentSettings() {
     const headers = [
       "Student Name", "Email", "Contact", "Father's Name", "Father's Contact", 
       "Course", "Batch", "Start Date", "End Date", "Total Fee", "Paid Amount", 
-      "Pending Amount", "Payment Status", "Education", "Address"
+      "Pending Amount", "Payment Status", "Cancelled", "Education", "Address"
     ];
 
     const csvContent = [
@@ -188,6 +224,7 @@ export default function StudentSettings() {
           paidAmount,
           pendingAmount,
           `"${paymentStatus.status}"`,
+          `"${student.cancelled === true ? 'Yes' : 'No'}"`,
           `"${student.studentEducation}"`,
           `"${student.studentAddress}"`
         ].join(",");
@@ -235,7 +272,7 @@ export default function StudentSettings() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <Card className="stat-card">
             <div className="flex items-center">
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-3 shadow-lg">
@@ -288,6 +325,20 @@ export default function StudentSettings() {
                   {filteredStudents?.filter(s => getPaymentStatus(s).status === "Pending").length || 0}
                 </div>
                 <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Payment Pending</div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="stat-card">
+            <div className="flex items-center">
+              <div className="bg-gradient-to-br from-gray-500 to-gray-600 rounded-2xl p-3 shadow-lg">
+                <Ban className="text-white" size={24} />
+              </div>
+              <div className="ml-4">
+                <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
+                  {filteredStudents?.filter(s => s.cancelled === true).length || 0}
+                </div>
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Cancelled</div>
               </div>
             </div>
           </Card>
@@ -346,6 +397,17 @@ export default function StudentSettings() {
                   <SelectItem value="paid">Fully Paid</SelectItem>
                   <SelectItem value="partial">Partial Payment</SelectItem>
                   <SelectItem value="pending">Payment Pending</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={cancelledFilter} onValueChange={setCancelledFilter}>
+                <SelectTrigger className="w-full lg:w-48">
+                  <SelectValue placeholder="Cancelled Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Students</SelectItem>
+                  <SelectItem value="active">Active Only</SelectItem>
+                  <SelectItem value="cancelled">Cancelled Only</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -510,24 +572,48 @@ export default function StudentSettings() {
                         </TableCell>
 
                         <TableCell>
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              onClick={() => setViewingStudent(student)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1"
-                            >
-                              <Eye className="h-3 w-3 mr-1" />
-                              View
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => deleteMutation.mutate(student.id)}
-                              className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1"
-                              disabled={deleteMutation.isPending}
-                            >
-                              <Trash2 className="h-3 w-3 mr-1" />
-                              Delete
-                            </Button>
+                          <div className="flex flex-col space-y-2">
+                            <div className="flex space-x-2">
+                              <Button
+                                size="sm"
+                                onClick={() => setViewingStudent(student)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => deleteMutation.mutate(student.id)}
+                                className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1"
+                                disabled={deleteMutation.isPending}
+                              >
+                                <Trash2 className="h-3 w-3 mr-1" />
+                                Delete
+                              </Button>
+                            </div>
+                            {student.cancelled === true ? (
+                              <Badge variant="destructive" className="text-xs w-fit">
+                                <Ban className="h-3 w-3 mr-1" />
+                                Cancelled
+                              </Badge>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  if (window.confirm('Are you sure you want to cancel this student enrollment? This action will mark the student as cancelled.')) {
+                                    cancelMutation.mutate(student.id);
+                                  }
+                                }}
+                                className="text-orange-600 border-orange-600 hover:bg-orange-50 text-xs px-2 py-1 w-fit"
+                                title="Cancel Student"
+                                disabled={cancelMutation.isPending}
+                              >
+                                <Ban className="h-3 w-3 mr-1" />
+                                Cancel
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
