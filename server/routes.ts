@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("✓ Default admin user created: admin/admin123");
     }
   } catch (error) {
-    console.error("Users table error:", error.message);
+    console.error("Users table error:", error instanceof Error ? error.message : String(error));
     console.log("❌ Database not properly initialized. Please run: psql $DATABASE_URL -f init-db.sql");
   }
 
@@ -358,6 +358,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Enrollment deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete enrollment" });
+    }
+  });
+
+  // Cancel enrollment
+  app.patch("/api/enrollments/:id/cancel", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Check if enrollment exists
+      const existingEnrollment = await storage.getEnrollment(id);
+      if (!existingEnrollment) {
+        return res.status(404).json({ message: "Enrollment not found" });
+      }
+
+      // Check if already cancelled
+      if (existingEnrollment.cancelled === true) {
+        return res.status(400).json({ message: "Enrollment is already cancelled" });
+      }
+
+      const enrollment = await storage.updateEnrollment(id, { 
+        cancelled: true
+      });
+      res.json({ message: "Enrollment cancelled successfully", enrollment });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to cancel enrollment" });
     }
   });
 

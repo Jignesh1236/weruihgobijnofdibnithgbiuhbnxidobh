@@ -53,6 +53,7 @@ export const enrollments = pgTable("enrollments", {
   feePlan: text("fee_plan").notNull(), // 'full' | 'installments'
   totalFee: decimal("total_fee", { precision: 10, scale: 2 }).notNull(),
   batchId: text("batch_id").notNull(),
+  cancelled: boolean("cancelled").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
