@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { 
   CreditCard, 
   ArrowLeft, 
@@ -57,6 +58,11 @@ export default function Fees() {
   });
 
   const filteredPayments = payments.filter(payment => {
+    // Don't show payments from cancelled students
+    if (payment.enrollment.cancelled) {
+      return false;
+    }
+    
     const matchesSearch = payment.enrollment.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          payment.enrollment.course.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMethod = methodFilter === "all" || payment.paymentMode === methodFilter;
