@@ -335,6 +335,7 @@ export class DatabaseStorage implements IStorage {
         enrollment: {
           id: enrollments.id,
           studentName: enrollments.studentName,
+          cancelled: enrollments.cancelled,
         },
         course: {
           name: courses.name,
@@ -349,6 +350,7 @@ export class DatabaseStorage implements IStorage {
       ...result.payment,
       enrollment: {
         studentName: result.enrollment?.studentName || '',
+        cancelled: result.enrollment?.cancelled || false,
         course: {
           name: result.course?.name || '',
         },
