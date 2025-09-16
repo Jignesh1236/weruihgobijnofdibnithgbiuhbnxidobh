@@ -79,6 +79,11 @@ export default function FeesManagement() {
 
   // Filter enrollments based on search and filters
   const filteredEnrollments = enrollments?.filter(enrollment => {
+    // Don't show cancelled students
+    if (enrollment.cancelled) {
+      return false;
+    }
+    
     const matchesSearch = 
       enrollment.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       enrollment.course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
