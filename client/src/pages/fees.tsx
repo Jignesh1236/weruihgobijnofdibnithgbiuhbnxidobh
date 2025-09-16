@@ -73,6 +73,8 @@ export default function Fees() {
     return `₹${parseFloat(amount).toLocaleString()}`;
   };
 
+  const { toast } = useToast();
+
   const exportToCSV = () => {
     if (!filteredPayments || filteredPayments.length === 0) {
       toast({
