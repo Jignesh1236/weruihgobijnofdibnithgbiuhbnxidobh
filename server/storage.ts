@@ -387,7 +387,8 @@ export class DatabaseStorage implements IStorage {
 
     const [enrollmentCount] = await db
       .select({ count: sql<number>`count(*)::int` })
-      .from(enrollments);
+      .from(enrollments)
+      .where(sql`${enrollments.cancelled} IS NOT TRUE`);
 
     const [totalCollected] = await db
       .select({ total: sql<string>`coalesce(sum(amount), 0)` })
@@ -400,6 +401,11 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
 
     enrollmentsWithPayments.forEach((enrollment) => {
+      // Skip cancelled students
+      if (enrollment.cancelled) {
+        return;
+      }
+
       const paidAmount = enrollment.payments.reduce((sum, payment) => 
         sum + parseFloat(payment.amount.toString()), 0);
       const totalFee = parseFloat(enrollment.totalFee.toString());
