@@ -237,6 +237,7 @@ export type EnrollmentWithDetails = Enrollment & {
 export type PaymentWithEnrollment = Payment & {
   enrollment: {
     studentName: string;
+    cancelled: boolean;
     course: {
       name: string;
     };
