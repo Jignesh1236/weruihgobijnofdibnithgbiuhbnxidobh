@@ -23,6 +23,8 @@ export default function StudentSettings() {
   const [batchFilter, setBatchFilter] = useState("");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("");
   const [cancelledFilter, setCancelledFilter] = useState("");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
   const [viewingStudent, setViewingStudent] = useState<EnrollmentWithDetails | null>(null);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
 
@@ -143,7 +145,23 @@ export default function StudentSettings() {
       if (paymentStatusFilter === "partial" && (pendingAmount <= 0 || pendingAmount >= totalFee)) matchesPaymentStatus = false;
     }
 
-    return matchesSearch && matchesCourse && matchesBatch && matchesCancelled && matchesPaymentStatus;
+    // Add date range filter
+    let matchesDateRange = true;
+    if (startDateFilter || endDateFilter) {
+      const studentStartDate = new Date(student.startDate);
+      
+      if (startDateFilter) {
+        const filterStartDate = new Date(startDateFilter);
+        if (studentStartDate < filterStartDate) matchesDateRange = false;
+      }
+      
+      if (endDateFilter) {
+        const filterEndDate = new Date(endDateFilter);
+        if (studentStartDate > filterEndDate) matchesDateRange = false;
+      }
+    }
+
+    return matchesSearch && matchesCourse && matchesBatch && matchesCancelled && matchesPaymentStatus && matchesDateRange;
   });
 
   const getPaymentStatus = (student: EnrollmentWithDetails) => {
@@ -410,12 +428,48 @@ export default function StudentSettings() {
                   <SelectItem value="cancelled">Cancelled Only</SelectItem>
                 </SelectContent>
               </Select>
+
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  placeholder="Start Date From"
+                  value={startDateFilter}
+                  onChange={(e) => setStartDateFilter(e.target.value)}
+                  className="w-full lg:w-40"
+                  title="Filter by enrollment start date from"
+                />
+                <Input
+                  type="date"
+                  placeholder="Start Date To"
+                  value={endDateFilter}
+                  onChange={(e) => setEndDateFilter(e.target.value)}
+                  className="w-full lg:w-40"
+                  title="Filter by enrollment start date to"
+                />
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-4">
               <Button onClick={exportToCSV} className="button-secondary">
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
+              </Button>
+              
+              <Button 
+                onClick={() => {
+                  setSearchTerm("");
+                  setCourseFilter("");
+                  setBatchFilter("");
+                  setPaymentStatusFilter("");
+                  setCancelledFilter("");
+                  setStartDateFilter("");
+                  setEndDateFilter("");
+                }}
+                variant="outline"
+                className="button-secondary"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Clear Filters
               </Button>
               
               {selectedStudents.length > 0 && (
