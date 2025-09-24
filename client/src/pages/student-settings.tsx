@@ -362,31 +362,8 @@ export default function StudentSettings() {
           </Card>
         </div>
 
-        {/* Large Search Bar Section */}
-        <Card className="stat-card mb-6">
-          <div className="p-6">
-            <div className="max-w-2xl mx-auto">
-              <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 text-center">
-                Search Students
-              </label>
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
-                <Input
-                  placeholder="Search by student name, contact number, or email address..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-16 text-lg w-full rounded-xl border-2 border-gray-200 focus:border-blue-500 shadow-lg"
-                />
-              </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
-                Start typing to search through {filteredStudents?.length || 0} enrolled students
-              </p>
-            </div>
-          </div>
-        </Card>
-
         {/* Filters and Actions */}
-        <Card className="stat-card mb-8">
+        <Card className="stat-card mb-6">
           <div className="p-6">
             <div className="flex flex-col lg:flex-row gap-4 mb-6">
               <Select value={courseFilter} onValueChange={setCourseFilter}>
@@ -493,6 +470,29 @@ export default function StudentSettings() {
                   Delete Selected ({selectedStudents.length})
                 </Button>
               )}
+            </div>
+          </div>
+        </Card>
+
+        {/* Large Search Bar Section */}
+        <Card className="stat-card mb-8">
+          <div className="p-6">
+            <div className="max-w-2xl mx-auto">
+              <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 text-center">
+                Search Students
+              </label>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                <Input
+                  placeholder="Search by student name, contact number, or email address..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-12 h-16 text-lg w-full rounded-xl border-2 border-gray-200 focus:border-blue-500 shadow-lg"
+                />
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">
+                Start typing to search through {filteredStudents?.length || 0} enrolled students
+              </p>
             </div>
           </div>
         </Card>
