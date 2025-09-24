@@ -366,14 +366,14 @@ export default function StudentSettings() {
         <Card className="stat-card mb-8">
           <div className="p-6">
             <div className="flex flex-col lg:flex-row gap-4 mb-6">
-              <div className="flex-1">
+              <div className="flex-1 lg:flex-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     placeholder="Search by name, contact, or email..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-12 text-base w-full"
                   />
                 </div>
               </div>
