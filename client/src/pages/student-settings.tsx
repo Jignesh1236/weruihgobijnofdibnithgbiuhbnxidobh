@@ -149,12 +149,12 @@ export default function StudentSettings() {
     let matchesDateRange = true;
     if (startDateFilter || endDateFilter) {
       const studentStartDate = new Date(student.startDate);
-      
+
       if (startDateFilter) {
         const filterStartDate = new Date(startDateFilter);
         if (studentStartDate < filterStartDate) matchesDateRange = false;
       }
-      
+
       if (endDateFilter) {
         const filterEndDate = new Date(endDateFilter);
         if (studentStartDate > filterEndDate) matchesDateRange = false;
@@ -264,11 +264,11 @@ export default function StudentSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-gray-900 dark:via-blue-950/20 dark:to-purple-950/10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/10 dark:from-gray-900 dark:via-blue-950/20 dark:to-purple-950/10">
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-2xl shadow-xl mb-8">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-2xl shadow-xl mb-8">
             <Button
               variant="ghost"
               onClick={() => setLocation("/")}
@@ -362,130 +362,6 @@ export default function StudentSettings() {
           </Card>
         </div>
 
-        {/* Filters and Actions */}
-        <Card className="stat-card mb-8">
-          <div className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4 mb-6">
-              <div className="flex-1 lg:flex-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search by name, contact, or email..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-12 text-base w-full"
-                  />
-                </div>
-              </div>
-              
-              <Select value={courseFilter} onValueChange={setCourseFilter}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Filter by Course" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Courses</SelectItem>
-                  {courses?.map((course) => (
-                    <SelectItem key={course.id} value={course.id}>
-                      {course.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={batchFilter} onValueChange={setBatchFilter}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Filter by Batch" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Batches</SelectItem>
-                  {BATCHES.map((batch) => (
-                    <SelectItem key={batch.id} value={batch.id}>
-                      {batch.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={paymentStatusFilter} onValueChange={setPaymentStatusFilter}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Payment Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="paid">Fully Paid</SelectItem>
-                  <SelectItem value="partial">Partial Payment</SelectItem>
-                  <SelectItem value="pending">Payment Pending</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={cancelledFilter} onValueChange={setCancelledFilter}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Cancelled Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Students</SelectItem>
-                  <SelectItem value="active">Active Only</SelectItem>
-                  <SelectItem value="cancelled">Cancelled Only</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex gap-2">
-                <Input
-                  type="date"
-                  placeholder="Start Date From"
-                  value={startDateFilter}
-                  onChange={(e) => setStartDateFilter(e.target.value)}
-                  className="w-full lg:w-40"
-                  title="Filter by enrollment start date from"
-                />
-                <Input
-                  type="date"
-                  placeholder="Start Date To"
-                  value={endDateFilter}
-                  onChange={(e) => setEndDateFilter(e.target.value)}
-                  className="w-full lg:w-40"
-                  title="Filter by enrollment start date to"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4">
-              <Button onClick={exportToCSV} className="button-secondary">
-                <Download className="mr-2 h-4 w-4" />
-                Export CSV
-              </Button>
-              
-              <Button 
-                onClick={() => {
-                  setSearchTerm("");
-                  setCourseFilter("");
-                  setBatchFilter("");
-                  setPaymentStatusFilter("");
-                  setCancelledFilter("");
-                  setStartDateFilter("");
-                  setEndDateFilter("");
-                }}
-                variant="outline"
-                className="button-secondary"
-              >
-                <Filter className="mr-2 h-4 w-4" />
-                Clear Filters
-              </Button>
-              
-              {selectedStudents.length > 0 && (
-                <Button 
-                  onClick={handleBulkDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                  disabled={bulkDeleteMutation.isPending}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Selected ({selectedStudents.length})
-                </Button>
-              )}
-            </div>
-          </div>
-        </Card>
-
         {/* Students Table */}
         <Card className="stat-card">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -504,7 +380,7 @@ export default function StudentSettings() {
               )}
             </div>
           </div>
-          
+
           <div className="overflow-x-auto">
             {isLoading ? (
               <div className="p-6 text-center">Loading students...</div>
@@ -689,7 +565,7 @@ export default function StudentSettings() {
                   Student Details: {viewingStudent.studentName}
                 </DialogTitle>
               </DialogHeader>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Personal Information */}
                 <div className="space-y-4">
